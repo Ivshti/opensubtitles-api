@@ -1,0 +1,21 @@
+{
+  "name": "opensubtitles-api",
+  "version": "0.0.2",
+  "homepage": "",
+  "description": "",
+  "author": {
+    "name": "Popcorn Time"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://git.popcorntime.io/popcorntime/opensubtitles-api.git"
+  },
+  "dependencies": {
+    "q": "1.0.1",
+    "lodash": "^2.4.1",
+    "xmlrpc": "latest"
+  },
+  "readme": "",
+  "readmeFilename": "README.md"
+}

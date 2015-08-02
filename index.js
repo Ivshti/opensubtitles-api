@@ -13,7 +13,7 @@ var login = function (userAgent) {
 
         client.methodCall('LogIn', ['', '', 'en', userAgent], function (err, res) {
             if (err || !res) {
-                var errorMessage = err ? err : new Error('no token returned');
+                var errorMessage = err ? err.message : new Error('no token returned');
                 return reject(errorMessage);
             }
             return resolve(res.token);

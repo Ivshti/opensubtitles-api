@@ -44,6 +44,25 @@ os.api.LogIn(function (err, res, token) {
 ```
 ------
 
+For the os.search() function, these parameters are accepted:
+
+```
+os.search({
+    sublanguageid: 'fr'         // can be an array, 'all', or be omitted.
+    hash: '8e245d9679d31e12'    // 'hash' is calculated automa-
+    path: 'foo/bar.mp4'         // tically if you also pass 'path'.
+    filename: 'bar.mp4'
+    season: '2'
+    episode: '3'
+    imdbid: '528809'            // 'tt528809' is fine too.
+    filesize: '129994823'       // total size, in bytes.
+    query: 'Charlie Chaplin'
+}).then(function (subtitles) {
+    // an array of objects, no duplicates, ordered by
+    // matching + uploader, with total downloads as fallback
+});
+```
+
 
 ### The MIT License (MIT)
 

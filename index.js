@@ -16,7 +16,7 @@ OpenSubtitles.prototype.login = function () {
 
     this.api.LogIn(function (error, response) {
         if (error || (response && !response.token)) {
-            return defer.reject(new Error('No token returned: ' + (response.status || error.message)));
+            return defer.reject(error || new Error('No token returned: ' + response.status));
         }
         return defer.resolve(response.token);
     }, this.username, this.password, this.lang, this.useragent);
@@ -25,25 +25,23 @@ OpenSubtitles.prototype.login = function () {
 };
 
 OpenSubtitles.prototype.search = function (data) {
-    var self = this;
-
     return this.login()
         .then(function (token) {
-        data.token = token;
-        return libsearch.bestMatch(data);
-    }).catch(function (error) {
-        if (error.message === 'No result') {
-            // try another search method
-            return libsearch.bestMatch({
-                filename: data.filename,
-                recheck: true,
-                token: data.token
-            });
-        } else {
-            console.log(error)
-            return error;
-        }
-    });
+            data.token = token;
+            return libsearch.bestMatch(data);
+        })
+        .fail(function (error) {
+            if (error.message === 'No result') {
+                // try another search method
+                return libsearch.bestMatch({
+                    filename: data.filename,
+                    recheck: true,
+                    token: data.token
+                });
+            } else {
+                return error;
+            }
+        });
 };
 
 OpenSubtitles.prototype.getHash = function (path) {
@@ -51,7 +49,7 @@ OpenSubtitles.prototype.getHash = function (path) {
 
     libhash.computeHash(function (error, response) {
         if (error || !response) {
-            return defer.reject(new Error('Hash computing failed: ' + (error.message || 'no hash returned')));
+            return defer.reject(error || new Error('No hash returned'));
         }
         return defer.resolve(response);
     }, path);

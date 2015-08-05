@@ -5,6 +5,46 @@
 - Based on OpenSRTJS, under MIT - Copyright (c) 2014 Eóin Martin
 - This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
 
+------
+
+### Examples:
+
+```
+var OS = require('opensubtitles-api');
+var os = new OS('', '', 'en', 'YourUserAgent');
+
+os.login()
+  .then(function(token){console.log(token)})
+  .catch(function(err){console.log(err)});
+```
+------
+
+```
+var OS = require('opensubtitles-api');
+var os = new OS();
+
+os.getHash('foo/bar.mp4')
+    .then(function (hash) {
+        console.log(hash);
+    });
+```
+
+------
+
+```
+// os.api.method for raw xml-rpc capabilities
+var OS = require('opensubtitles-api');
+var os = new OS();
+
+os.api.LogIn(function (err, res, token) {
+    console.log(err);
+    console.log(res);
+    console.log(token);
+}, '', '', 'en', 'Popcorn Time v1')
+```
+------
+
+
 ### The MIT License (MIT)
 
     Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -1,131 +1,60 @@
-var xmlrpc = require('xmlrpc'),
-    Q = require('q'),
-    _ = require('lodash');
+var OS = require('./lib/opensubtitles.js'),
+    libhash = require('./lib/hash.js'),
+    libsearch = require('./lib/search.js'),
+    Q = require('q');
 
-var client = xmlrpc.createClient({ host: 'api.opensubtitles.org', port: 80, path: '/xml-rpc'});
-
-function OpenSubtitles() {
-    return;
-}
-
-var login = function (userAgent) {
-    return Q.Promise(function (resolve, reject) {
-
-        client.methodCall('LogIn', ['', '', 'en', userAgent], function (err, res) {
-            if (err || !res) {
-                var errorMessage = err ? err.message : new Error('no token returned');
-                return reject(errorMessage);
-            }
-            return resolve(res.token);
-        });
-
-    });
+var OpenSubtitles = module.exports = function (username, password, lang, useragent) {
+    this.api = new OS();
+    this.username = username || '';
+    this.password = password || '';
+    this.lang = lang || 'en';
+    this.useragent = useragent;
 };
 
-var search = function (data) {
-    var opts = {};
-    opts.sublanguageid = 'all';
+OpenSubtitles.prototype.login = function () {
+    var defer = Q.defer();
 
-    // Do a hash or imdb check first (either), then fallback to filename
-	// Without imdbid, only check filename
-    if (data.hash) {
-        opts.moviehash = data.hash;
-    } else if (data.imdbid) {
-        opts.imdbid = data.imdbid.replace('tt', '');
-        opts.season = data.season;
-        opts.episode = data.episode;
-    } else {
-        opts.tag = data.filename;
-    }
+    this.api.LogIn(function (error, response) {
+        if (error || (response && !response.token)) {
+            return defer.reject(new Error('No token returned: ' + (response.status || error.message)));
+        }
+        return defer.resolve(response.token);
+    }, this.username, this.password, this.lang, this.useragent);
 
-    return Q.Promise(function (resolve, reject) {
+    return defer.promise;
+};
 
-        client.methodCall('SearchSubtitles', [
-            data.token,
-            [
-                opts
-            ]
-        ], function (err, res) {
+OpenSubtitles.prototype.search = function (data) {
+    var self = this;
 
-            if (err || res.data === false) {
-                if (data.recheck !== true && data.imdbid) {
-                    return reject(err || 'noResult');
-                } else {
-                    return reject(err || 'Unable to extract subtitle');
-                }
-            }
-
-            // build our output
-            var subs = {};
-
-            _.each(res.data, function (sub) {
-
-                if (sub.SubFormat !== 'srt') {
-                    return;
-                }
-
-                // episode check
-                if (res.data.season && res.data.episode) {
-                    if (parseInt(sub.SeriesIMDBParent, 10) !== parseInt(res.data.imdbid.replace('tt', ''), 10)) {
-                        return;
-                    }
-                    if (sub.SeriesSeason !== res.data.season) {
-                        return;
-                    }
-                    if (sub.SeriesEpisode !== res.data.episode) {
-                        return;
-                    }
-                }
-
-                var tmp = {};
-                tmp.url = sub.SubDownloadLink.replace('.gz', '.srt');
-                tmp.lang = sub.ISO639;
-                tmp.downloads = sub.SubDownloadsCnt;
-                tmp.score = 0;
-
-                if (sub.MatchedBy === 'moviehash') {
-                    tmp.score += 100;
-                }
-                if (sub.MatchedBy === 'tag') {
-                    tmp.score += 50;
-                }
-                if (sub.UserRank === 'trusted') {
-                    tmp.score += 100;
-                }
-                if (!subs[tmp.lang]) {
-                    subs[tmp.lang] = tmp;
-                } else {
-                    // If score is 0 or equal, sort by downloads
-                    if (tmp.score > subs[tmp.lang].score || (tmp.score === subs[tmp.lang].score && tmp.downloads > subs[tmp.lang].score.downloads)) {
-                        subs[tmp.lang] = tmp;
-                    }
-                }
+    return this.login()
+        .then(function (token) {
+        data.token = token;
+        return libsearch.bestMatch(data);
+    }).catch(function (error) {
+        if (error.message === 'No result') {
+            // try another search method
+            return libsearch.bestMatch({
+                filename: data.filename,
+                recheck: true,
+                token: data.token
             });
-
-            return resolve(subs);
-
-        });
-
+        } else {
+            console.log(error)
+            return error;
+        }
     });
 };
 
-OpenSubtitles.prototype.searchEpisode = function (data, userAgent) {
-    return login(userAgent)
-        .then(function(token) {
-            data.token = token;
-            return search(data);
-        }).fail(function (error) {
-            if (error === 'noResult') {
-                // try another search method
-                return search({
-                    filename: data.filename,
-                    recheck: true,
-                    token: data.token
-                });
-            } else {
-                return error;
-            }
-        });
-};
+OpenSubtitles.prototype.getHash = function (path) {
+    var defer = Q.defer();
 
-module.exports = new OpenSubtitles();
+    libhash.computeHash(function (error, response) {
+        if (error || !response) {
+            return defer.reject(new Error('Hash computing failed: ' + (error.message || 'no hash returned')));
+        }
+        return defer.resolve(response);
+    }, path);
+
+    return defer.promise;
+};

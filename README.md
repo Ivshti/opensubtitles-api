@@ -22,7 +22,7 @@ OpenSubtitles.login()
 var OS = require('opensubtitles-api');
 var OpenSubtitles = new OS();
 
-OpenSubtitles.getHash('foo/bar.mp4')
+OpenSubtitles.getHash('C:\\GIT\\breakdance.avi')
     .then(function (hash) {
         console.log(hash);
     });

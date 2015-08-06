@@ -12,45 +12,37 @@ var OpenSubtitles = module.exports = function (username, password, lang, userage
 };
 
 OpenSubtitles.prototype.login = function () {
-    var defer = Q.defer();
-
-    this.api.LogIn(function (error, response) {
-        if (error || !response || (response && !response.token)) {
-            defer.reject(error || new Error('LogIn response: ' + response.status));
-        }
-        defer.resolve(response.token);
-    }, this.username, this.password, this.lang, this.useragent);
-
-    return defer.promise;
+    var self = this;
+    return Q.Promise(function (resolve, reject) {
+        self.api.LogIn(self.username, self.password, self.lang, self.useragent)
+            .then(function (response) {
+                if (response.token) {
+                    return resolve(response.token);
+                } else {
+                    return reject(new Error(response.status));
+                }
+            })
+            .catch(reject);
+    });
 };
 
 OpenSubtitles.prototype.search = function (data) {
-    var defer = Q.defer();
-
-    this.login()
-        .then(function (token) {
-            data.token = token;
-            libsearch.bestMatch(data)
-                .then(function(subtitles) {
-                    defer.resolve(subtitles);
-                });
-        })
-        .catch(function (error) {
-            defer.reject(error);
-        });
-
-    return defer.promise;
+    var self = this;
+    return Q.Promise(function (resolve, reject) {
+        self.login()
+            .then(function (token) {
+                data.token = token;
+                return libsearch.bestMatch(data);
+            })
+            .then(resolve)
+            .catch(reject);
+    });
 };
 
 OpenSubtitles.prototype.getHash = function (path) {
-    var defer = Q.defer();
-
-    libhash.computeHash(function (error, response) {
-        if (error || !response) {
-            defer.reject(error || new Error('No hash returned'));
-        }
-        defer.resolve(response);
-    }, path);
-
-    return defer.promise;
+    return Q.Promise(function (resolve, reject) {
+        libhash.computeHash(path)
+            .then(resolve)
+            .catch(reject);
+    });
 };

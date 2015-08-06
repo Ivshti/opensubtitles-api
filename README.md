@@ -2,7 +2,6 @@
 
 **Node.js API for downloading subtitles from OpenSubtitles.org**
 
-- Based on OpenSRTJS, under MIT - Copyright (c) 2014 Eóin Martin
 - This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
 
 ------
@@ -40,7 +39,7 @@ OpenSubtitles.api.LogIn(function (err, res, token) {
     console.log(err);
     console.log(res);
     console.log(token);
-}, 'username', 'password', 'en', 'Popcorn Time v1')
+}, 'username', 'password', 'en', 'UserAgent')
 ```
 ------
 

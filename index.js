@@ -15,33 +15,31 @@ OpenSubtitles.prototype.login = function () {
     var defer = Q.defer();
 
     this.api.LogIn(function (error, response) {
-        if (error || (response && !response.token)) {
-            return defer.reject(error || new Error('No token returned: ' + response.status));
+        if (error || !response || (response && !response.token)) {
+            defer.reject(error || new Error('LogIn response: ' + response.status));
         }
-        return defer.resolve(response.token);
+        defer.resolve(response.token);
     }, this.username, this.password, this.lang, this.useragent);
 
     return defer.promise;
 };
 
 OpenSubtitles.prototype.search = function (data) {
-    return this.login()
+    var defer = Q.defer();
+
+    this.login()
         .then(function (token) {
             data.token = token;
-            return libsearch.bestMatch(data);
-        })
-        .fail(function (error) {
-            if (error.message === 'No result') {
-                // try another search method
-                return libsearch.bestMatch({
-                    filename: data.filename,
-                    recheck: true,
-                    token: data.token
+            libsearch.bestMatch(data)
+                .then(function(subtitles) {
+                    defer.resolve(subtitles);
                 });
-            } else {
-                return error;
-            }
+        })
+        .catch(function (error) {
+            defer.reject(error);
         });
+
+    return defer.promise;
 };
 
 OpenSubtitles.prototype.getHash = function (path) {
@@ -49,9 +47,9 @@ OpenSubtitles.prototype.getHash = function (path) {
 
     libhash.computeHash(function (error, response) {
         if (error || !response) {
-            return defer.reject(error || new Error('No hash returned'));
+            defer.reject(error || new Error('No hash returned'));
         }
-        return defer.resolve(response);
+        defer.resolve(response);
     }, path);
 
     return defer.promise;

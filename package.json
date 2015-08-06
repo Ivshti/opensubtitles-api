@@ -5,6 +5,12 @@
         "name": "Popcorn Time"
     },
     "main": "index.js",
+    "keywords": [
+        "opensubtitles",
+        "subtitles",
+        "api",
+        "srt"
+    ],
     "repository": {
         "type": "git",
         "url": "https://git.popcorntime.io/popcorntime/opensubtitles-api.git"

@@ -11,9 +11,9 @@
 
 ```
 var OS = require('opensubtitles-api');
-var os = new OS('', '', 'en', 'YourUserAgent');
+var OpenSubtitles = new OS('username', 'password', 'en', 'YourUserAgent');
 
-os.login()
+OpenSubtitles.login()
   .then(function(token){console.log(token)})
   .catch(function(err){console.log(err)});
 ```
@@ -21,9 +21,9 @@ os.login()
 
 ```
 var OS = require('opensubtitles-api');
-var os = new OS();
+var OpenSubtitles = new OS();
 
-os.getHash('foo/bar.mp4')
+OpenSubtitles.getHash('foo/bar.mp4')
     .then(function (hash) {
         console.log(hash);
     });
@@ -32,23 +32,23 @@ os.getHash('foo/bar.mp4')
 ------
 
 ```
-// os.api.method for raw xml-rpc capabilities
+// OpenSubtitles.api.method for raw xml-rpc capabilities
 var OS = require('opensubtitles-api');
-var os = new OS();
+var OpenSubtitles = new OS();
 
-os.api.LogIn(function (err, res, token) {
+OpenSubtitles.api.LogIn(function (err, res, token) {
     console.log(err);
     console.log(res);
     console.log(token);
-}, '', '', 'en', 'Popcorn Time v1')
+}, 'username', 'password', 'en', 'Popcorn Time v1')
 ```
 ------
 
-For the os.search() function, these parameters are accepted:
+For the OpenSubtitles.search() function, these parameters are accepted:
 
 ```
-os.search({
-    sublanguageid: 'fr'         // can be an array, 'all', or be omitted.
+OpenSubtitles.search({
+    sublanguageid: 'fr'         // can be an array.join, 'all', or be omitted.
     hash: '8e245d9679d31e12'    // 'hash' is calculated automa-
     path: 'foo/bar.mp4'         // tically if you also pass 'path'.
     filename: 'bar.mp4'

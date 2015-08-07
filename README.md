@@ -1,87 +1,127 @@
-### OpenSubtitles API
+# opensubtitles-api
 
-**Node.js API for downloading subtitles from OpenSubtitles.org**
+OpenSubtitles.org api wrapper for downloading subtitles.
 
 - This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
 
 ------
 
-### Examples:
+## Quick start
 
-```
+    npm install opensubtitles-api
+
+Then:
+
+```js
 var OS = require('opensubtitles-api');
-var OpenSubtitles = new OS('username', 'password', 'en', 'YourUserAgent');
-
-OpenSubtitles.login()
-  .then(function(token){console.log(token)})
-  .catch(function(err){console.log(err)});
+var OpenSubtitles = new OS('UserAgent', 'Username', 'Password');
 ```
+
+*You can omit username and password to use OpenSubtitles.org anonymously (not all methods are available)*
+
 ------
 
-```
-var OS = require('opensubtitles-api');
-var OpenSubtitles = new OS();
+## Examples:
 
-OpenSubtitles.getHash('C:\\GIT\\breakdance.avi')
-    .then(function (hash) {
-        console.log(hash);
+A simple login:
+
+```js
+OpenSubtitles.login()
+    .then(function(token){
+        console.log(token)
+    })
+    .catch(function(err){
+        console.log(err)
     });
 ```
 
+will return: `6l89visrt089tqsm0qh4trbno6`
+
+NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed, all calls are made by the module itself.
+
 ------
 
-```
+Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
+
+```js
 // OpenSubtitles.api.method for raw xml-rpc capabilities
 var OS = require('opensubtitles-api');
-var OpenSubtitles = new OS();
+var OpenSubtitles = new OS('UserAgent');
 
-OpenSubtitles.api.LogIn(function (err, res, token) {
-    console.log(err);
-    console.log(res);
-    console.log(token);
-}, 'username', 'password', 'en', 'UserAgent')
+OpenSubtitles.api.LogIn('username', 'password', 'en', 'UserAgent')
+    .then( // do stuff...
 ```
+
+NOTE: All methods should be supported. You can consult `./lib/opensubtitles.js` for the list of available calls and the required parameters.
+
 ------
 
-For the OpenSubtitles.search() function, these parameters are accepted:
+Search the best subtitles in all languages for a given movie/episode:
 
 ```
 OpenSubtitles.search({
-    sublanguageid: 'fr'         // can be an array.join, 'all', or be omitted.
-    hash: '8e245d9679d31e12'    // 'hash' is calculated automa-
-    path: 'foo/bar.mp4'         // tically if you also pass 'path'.
-    filename: 'bar.mp4'
+    sublanguageid: 'fr'         // Can be an array.join, 'all', or be omitted.
+    hash: '8e245d9679d31e12'    // Size + 64bit checksum of the first and last 64k
+    filesize: '129994823'       // Total size, in bytes.
+    path: 'foo/bar.mp4'         // Complete path to the video file, it allows
+                                //   to automatically calculate 'hash'.
+    filename: 'bar.mp4'         // The video file name. Better if extension
+                                //   is included
     season: '2'
     episode: '3'
     imdbid: '528809'            // 'tt528809' is fine too.
-    filesize: '129994823'       // total size, in bytes.
-    query: 'Charlie Chaplin'
+    query: 'Charlie Chaplin'    // Text-based query, this is not recommended.
 }).then(function (subtitles) {
-    // an array of objects, no duplicates, ordered by
-    // matching + uploader, with total downloads as fallback
+    // an array of objects, no duplicates (ordered by
+    // matching + uploader, with total downloads as fallback)
 });
 ```
 
+Example output:
 
-### The MIT License (MIT)
+```js
+Object {
+    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    ru: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+}
+```
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+NOTE: No parameter is mandatory, but at least one is required. The more possibilities you add, the best is your chance to get the best matching subtitles in a large variation of languages.
+I don't recommend ever using "query", as it is highly error-prone.
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+Here's how the function prioritize:
+1. Hash + filesize (or Path, that will be used to calculate hash and filesize)
+2. Filename
+3. IMDBid (+ Season and Episode for TV Series)
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+The function internally ranks the subtitles to get the best match given the info you provided. It works like this:
+
+```
+matched by 'hash' and uploaded by:
+    + admin|trusted     12
+    + platinum|gold     11
+    + user|anon         8
+
+matched by tag and uploaded by:
+    + admin|trusted     11
+    + platinum|gold     10
+    + user|anon         7
+
+matched by imdb and uploaded by:
+    + admin|trusted     9
+    + platinum|gold     8
+    + user|anon         5
+
+matched by other and uploaded by:
+    + admin|trusted     4
+    + platinum|gold     3
+    + user|anon         0
+```
+
+-----
 
 ### The GNU GENERAL PUBLIC LICENSE (GPL)
 

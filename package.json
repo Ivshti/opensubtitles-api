@@ -1,10 +1,13 @@
 {
     "name": "opensubtitles-api",
     "version": "1.0.0",
+    "description": "OpenSubtitles.org api wrapper for downloading subtitles",
     "author": {
-        "name": "Popcorn Time"
+        "name": "Popcorn Time",
+        "email": "hello@popcorntime.io"
     },
     "main": "index.js",
+    "license": "GPL-3.0",
     "keywords": [
         "opensubtitles",
         "subtitles",

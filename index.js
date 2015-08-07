@@ -3,18 +3,23 @@ var OS = require('./lib/opensubtitles.js'),
     libsearch = require('./lib/search.js'),
     Q = require('q');
 
-var OpenSubtitles = module.exports = function (username, password, lang, useragent) {
-    this.api = new OS();
-    this.username = username || '';
-    this.password = password || '';
-    this.lang = lang || 'en';
-    this.useragent = useragent;
+var OpenSubtitles = module.exports = function (useragent, username, password) {
+    if (!useragent) {
+        throw new Error('Missing User Agent');
+    }
+
+    this.api = new OS(useragent);
+
+    this.credentials = {};
+    this.credentials.username = username || '';
+    this.credentials.password = password || '';
+    this.credentials.useragent = useragent;
 };
 
 OpenSubtitles.prototype.login = function () {
     var self = this;
     return Q.Promise(function (resolve, reject) {
-        self.api.LogIn(self.username, self.password, self.lang, self.useragent)
+        self.api.LogIn(self.credentials.username, self.credentials.password, 'en', self.credentials.useragent)
             .then(function (response) {
                 if (response.token) {
                     return resolve(response.token);

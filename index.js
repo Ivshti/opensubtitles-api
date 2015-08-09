@@ -1,11 +1,12 @@
 var OS = require('./lib/opensubtitles.js'),
     libhash = require('./lib/hash.js'),
     libsearch = require('./lib/search.js'),
+    libupload = require('./lib/upload.js'),
     Q = require('q');
 
 var OpenSubtitles = module.exports = function (useragent, username, password) {
     if (!useragent) {
-        throw new Error('Missing User Agent');
+        throw new Error('Missing useragent');
     }
 
     this.api = new OS(useragent);
@@ -24,7 +25,7 @@ OpenSubtitles.prototype.login = function () {
                 if (response.token) {
                     return resolve(response.token);
                 } else {
-                    return reject(new Error(response.status));
+                    throw new Error(response.status);
                 }
             })
             .catch(reject);
@@ -37,7 +38,20 @@ OpenSubtitles.prototype.search = function (data) {
         self.login()
             .then(function (token) {
                 data.token = token;
-                return libsearch.bestMatch(data);
+                return libsearch.bestMatch(self.credentials.useragent, data);
+            })
+            .then(resolve)
+            .catch(reject);
+    });
+};
+
+OpenSubtitles.prototype.upload = function (data) {
+    var self = this;
+    return Q.Promise(function (resolve, reject) {
+        self.login()
+            .then(function (token) {
+                data.token = token;
+                return libupload.startFlow(self.credentials.useragent, data);
             })
             .then(resolve)
             .catch(reject);
@@ -45,9 +59,9 @@ OpenSubtitles.prototype.search = function (data) {
 };
 
 OpenSubtitles.prototype.getHash = function (path) {
-    return Q.Promise(function (resolve, reject) {
-        libhash.computeHash(path)
-            .then(resolve)
-            .catch(reject);
-    });
+    return libhash.computeHash(path);
+};
+
+OpenSubtitles.prototype.getMD5 = function (path) {
+    return libhash.computeMD5(path);
 };

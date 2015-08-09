@@ -3,6 +3,7 @@
 OpenSubtitles.org api wrapper for downloading subtitles.
 
 - This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
+- More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)
 
 ------
 
@@ -23,7 +24,7 @@ var OpenSubtitles = new OS('UserAgent', 'Username', 'Password');
 
 ## Examples:
 
-A simple login:
+###A simple login:
 
 ```js
 OpenSubtitles.login()
@@ -41,7 +42,7 @@ NOTE: The `login()` call is useful to verify "Username" and "Password" (if you g
 
 ------
 
-Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
+###Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
 
 ```js
 // OpenSubtitles.api.method for raw xml-rpc capabilities
@@ -121,7 +122,49 @@ matched by other and uploaded by:
     + user|anon         0
 ```
 
------
+------
+
+###Upload a subtitle:
+
+```
+OpenSubtitles.upload({
+        path: '/home/user/video.avi',       // path to video file
+        subpath: '/home/user/video.srt'     // path to subtitle
+    })
+    .then(function(response){
+        console.log(response)
+    })
+    .catch(function(err){
+        console.log(err)
+    });
+```
+
+Example output (if successfully uploaded):
+
+```
+{
+    status: '200 OK'
+    data: 'http://www.opensubtitles.org/subtitles/123456' //absolute link to subtitles
+    seconds: '1.171'
+}
+```
+
+Only `path` and `subpath` are mandatory. However, it is **highly recommended** to also provide `imdbid` to make sure you can add a subtitle even if the movie isn't already in the database.
+
+Optionnal parameters are self-explanatory:
+
+- sublanguageid
+- automatictranslation
+- subauthorcomment
+- highdefinition
+- releasename
+- aka
+- hearingimpaired
+- moviefps
+- movieframes
+- movietimems
+
+------
 
 ### The GNU GENERAL PUBLIC LICENSE (GPL)
 

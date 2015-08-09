@@ -24,7 +24,7 @@ var OpenSubtitles = new OS('UserAgent', 'Username', 'Password');
 
 ## Examples:
 
-###A simple login:
+### A simple login:
 
 ```js
 OpenSubtitles.login()
@@ -42,7 +42,7 @@ NOTE: The `login()` call is useful to verify "Username" and "Password" (if you g
 
 ------
 
-###Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
+### Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
 
 ```js
 // OpenSubtitles.api.method for raw xml-rpc capabilities
@@ -82,10 +82,10 @@ Example output:
 
 ```js
 Object {
-    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
-    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
-    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
-    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
     ru: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
 }
 ```
@@ -124,9 +124,9 @@ matched by other and uploaded by:
 
 ------
 
-###Upload a subtitle:
+### Upload a subtitle:
 
-```
+```js
 OpenSubtitles.upload({
         path: '/home/user/video.avi',       // path to video file
         subpath: '/home/user/video.srt'     // path to subtitle
@@ -141,10 +141,10 @@ OpenSubtitles.upload({
 
 Example output (if successfully uploaded):
 
-```
-{
-    status: '200 OK'
-    data: 'http://www.opensubtitles.org/subtitles/123456' //absolute link to subtitles
+```js
+Object {
+    status: '200 OK',
+    data: 'http://www.opensubtitles.org/subtitles/123456', //absolute link to subtitles
     seconds: '1.171'
 }
 ```
@@ -166,7 +166,7 @@ Optionnal parameters are self-explanatory:
 
 ------
 
-### The GNU GENERAL PUBLIC LICENSE (GPL)
+## The GNU GENERAL PUBLIC LICENSE (GPL)
 
     If you distribute a copy or make a fork of the project, you have to credit this project as source.
 

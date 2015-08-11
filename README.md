@@ -9,11 +9,7 @@ In addition of allowing to use all available methodCalls asynchronously, it also
 - `search`: Chained function returning the best matching subtitles based on the information you can feed it.
 - `upload`: Chained function requiring only the path to the video and to the subtitle files to send new subtitles to OpenSubtitles.org (flow: LogIn > TryUploadSubtitles > UploadSubtitles)
 
-
-This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
-
-More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)
-
+*More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)*
 
 ------
 
@@ -184,6 +180,10 @@ Optionnal parameters are self-explanatory:
 - subauthorcomment
 
 ------
+
+## License
+
+This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
 
 ### The GNU GENERAL PUBLIC LICENSE (GPL)
 

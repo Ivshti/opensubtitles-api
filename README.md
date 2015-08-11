@@ -52,8 +52,8 @@ If successful, will return:
 
 ```js
 Object {
-    token: "8qnesakc65g8kj1d58i6fonm61", 
-    status: "200 OK", 
+    token: "8qnesekc42g8kj1d58i6fonm61"
+    status: "200 OK"
     seconds: 0.031
 }
 ```
@@ -62,7 +62,7 @@ Object {
 
 ------
 
-### Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
+### Get in touch with OpenSubtitles.org API directly:
 
 ```js
 var OS = require('opensubtitles-api');
@@ -76,7 +76,7 @@ OpenSubtitles.api.LogIn('username', 'password', 'en', 'UserAgent')
 
 ------
 
-Search the best subtitles in all languages for a given movie/episode:
+### Search the best subtitles in all languages for a given movie/episode:
 
 ```js
 OpenSubtitles.search({
@@ -109,8 +109,8 @@ Object {
 }
 ```
 
-NOTE: No parameter is mandatory, but at least one is required. The more possibilities you add, the best is your chance to get the best matching subtitles in a large variation of languages.
-I don't recommend ever using "query", as it is highly error-prone.
+*NOTE: No parameter is mandatory, but at least one is required. The more possibilities you add, the best is your chance to get the best matching subtitles in a large variation of languages.*
+*I don't recommend ever using "query", as it is highly error-prone.*
 
 Here's how the function prioritize:
 1. Hash + filesize (or Path, that will be used to calculate hash and filesize)
@@ -168,7 +168,7 @@ Object {
 }
 ```
 
-Only `path` and `subpath` are mandatory. However, it is **highly recommended** to also provide `imdbid` to make sure you can add a subtitle even if the movie isn't already in the database.
+*NOTE: Only `path` and `subpath` are mandatory. However, it is **highly recommended** to also provide `imdbid` to make sure you can add a subtitle even if the movie isn't already in the database.*
 
 Optionnal parameters are self-explanatory:
 
@@ -200,4 +200,4 @@ Optionnal parameters are self-explanatory:
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see http://www.gnu.org/licenses/ .
+    along with this program.  If not, see http://www.gnu.org/licenses/

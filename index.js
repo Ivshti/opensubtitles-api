@@ -48,20 +48,31 @@ OpenSubtitles.prototype.search = function (data) {
 OpenSubtitles.prototype.upload = function (data) {
     var self = this;
     return Q.Promise(function (resolve, reject) {
+        var persistent_data = {};
+
         self.login()
             .then(function (token) {
                 data.token = token;
-                return libupload.startFlow(self.credentials.useragent, data);
+                return libupload.createTryData(data);
+            })
+            .then(function (tryArray) {
+                persistent_data = tryArray.cd1;
+                return self.api.TryUploadSubtitles(data.token, tryArray);
+            })
+            .then(function (response) {
+                if (response.alreadyindb === 1) {
+                    resolve(response); // it exists, don't go further
+                } else {
+                    persistent_data.subpath = data.subpath; // inject subpath
+                    return libupload.parseResponse(response, persistent_data);
+                }
+            })
+            .then(libupload.createContent)
+            .then(libupload.arrangeUploadData)
+            .then(function (uploadArray) {
+                return self.api.UploadSubtitles(data.token, uploadArray);
             })
             .then(resolve)
             .catch(reject);
     });
-};
-
-OpenSubtitles.prototype.getHash = function (path) {
-    return libhash.computeHash(path);
-};
-
-OpenSubtitles.prototype.getMD5 = function (path) {
-    return libhash.computeMD5(path);
 };

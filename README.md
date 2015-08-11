@@ -1,9 +1,19 @@
 # opensubtitles-api
 
-OpenSubtitles.org api wrapper for downloading and uploading subtitles.
+**OpenSubtitles.org api wrapper for downloading and uploading subtitles.**
 
-- This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
-- More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)
+Based on Promises and thus working asynchronously (thanks to Bluebird), this module uses XML-RPC (thanks to xmlrpc) to communicate with OpenSubtitles through HTTPS using Node.js
+
+In addition of allowing to use all available methodCalls asynchronously, it also allows you to directly use powerfull custom calls, like: 
+
+- `search`: Chained function returning the best matching subtitles based on the information you can feed it.
+- `upload`: Chained function requiring only the path to the video and to the subtitle files to send new subtitles to OpenSubtitles.org (flow: LogIn > TryUploadSubtitles > UploadSubtitles)
+
+
+This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
+
+More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)
+
 
 ------
 
@@ -20,7 +30,7 @@ var OpenSubtitles = new OS('UserAgent', 'Username', 'Password');
 
 *You can omit username and password to use OpenSubtitles.org anonymously (not all methods are available)*
 
-NOTE: 'Password' can be a MD5 encrypted string, OpenSubtitles accept these. It is recommended to use it. You can get the MD5 of a PASSWORD string by doing: `require('crypto').createHash('md5').update(PASSWORD).digest('hex');`
+*NOTE: 'Password' can be a MD5 encrypted string, OpenSubtitles accept these. It is recommended to use it. You can get the MD5 of a PASSWORD string by doing: `require('crypto').createHash('md5').update(PASSWORD).digest('hex');`*
 
 ------
 
@@ -31,10 +41,10 @@ NOTE: 'Password' can be a MD5 encrypted string, OpenSubtitles accept these. It i
 ```js
 OpenSubtitles.login()
     .then(function(response){
-        console.log(response.token)
+        console.log(response);
     })
     .catch(function(err){
-        console.log(err)
+        console.log(err);
     });
 ```
 
@@ -48,14 +58,13 @@ Object {
 }
 ```
 
-NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed, all calls (search, upload) are made by the module itself.
+*NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed, all calls (search, upload) are made by the module itself.*
 
 ------
 
 ### Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
 
 ```js
-// OpenSubtitles.api.method for raw xml-rpc capabilities
 var OS = require('opensubtitles-api');
 var OpenSubtitles = new OS('UserAgent');
 
@@ -63,25 +72,25 @@ OpenSubtitles.api.LogIn('username', 'password', 'en', 'UserAgent')
     .then( // do stuff...
 ```
 
-NOTE: All methods should be supported. You can consult `./lib/opensubtitles.js` for the list of available calls and the required parameters.
+*NOTE: All methods should be supported. You can consult `./lib/opensubtitles.js` for the list of available calls and the required parameters.*
 
 ------
 
 Search the best subtitles in all languages for a given movie/episode:
 
-```
+```js
 OpenSubtitles.search({
-    sublanguageid: 'fr'         // Can be an array.join, 'all', or be omitted.
-    hash: '8e245d9679d31e12'    // Size + 64bit checksum of the first and last 64k
-    filesize: '129994823'       // Total size, in bytes.
-    path: 'foo/bar.mp4'         // Complete path to the video file, it allows
+    sublanguageid: 'fr',        // Can be an array.join, 'all', or be omitted.
+    hash: '8e245d9679d31e12',   // Size + 64bit checksum of the first and last 64k
+    filesize: '129994823',      // Total size, in bytes.
+    path: 'foo/bar.mp4',        // Complete path to the video file, it allows
                                 //   to automatically calculate 'hash'.
-    filename: 'bar.mp4'         // The video file name. Better if extension
+    filename: 'bar.mp4',        // The video file name. Better if extension
                                 //   is included
-    season: '2'
-    episode: '3'
-    imdbid: '528809'            // 'tt528809' is fine too.
-    query: 'Charlie Chaplin'    // Text-based query, this is not recommended.
+    season: '2',
+    episode: '3',
+    imdbid: '528809',           // 'tt528809' is fine too.
+    query: 'Charlie Chaplin',   // Text-based query, this is not recommended.
 }).then(function (subtitles) {
     // an array of objects, no duplicates (ordered by
     // matching + uploader, with total downloads as fallback)
@@ -92,10 +101,10 @@ Example output:
 
 ```js
 Object {
-    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
-    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
-    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
-    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
     ru: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
 }
 ```
@@ -142,20 +151,20 @@ OpenSubtitles.upload({
         subpath: '/home/user/video.srt'     // path to subtitle
     })
     .then(function(response){
-        console.log(response)
+        console.log(response);
     })
     .catch(function(err){
-        console.log(err)
+        console.log(err);
     });
 ```
 
 Example output (if successfully uploaded):
 
 ```js
-{
-    status: '200 OK',
-    data: 'http://www.opensubtitles.org/subtitles/123456', //absolute link to subtitles
-    seconds: '1.171',
+Object {
+    status: '200 OK'
+    data: 'http://www.opensubtitles.org/subtitles/123456' //absolute link to subtitles
+    seconds: '1.171'
 }
 ```
 

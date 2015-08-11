@@ -72,7 +72,13 @@ OpenSubtitles.prototype.upload = function (data) {
             .then(function (uploadArray) {
                 return self.api.UploadSubtitles(data.token, uploadArray);
             })
-            .then(resolve)
+            .then(function (response) {
+                if (response.data !== '' && response.status.match(/200/)) {
+                    resolve(response);
+                } else {
+                    throw new Error(response.status);
+                }
+            })
             .catch(reject);
     });
 };

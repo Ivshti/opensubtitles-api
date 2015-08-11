@@ -1,7 +1,7 @@
 {
     "name": "opensubtitles-api",
     "version": "1.0.0",
-    "description": "OpenSubtitles.org api wrapper for downloading subtitles",
+    "description": "OpenSubtitles.org api wrapper for downloading and uploading subtitles",
     "author": {
         "name": "Popcorn Time",
         "email": "hello@popcorntime.io"
@@ -19,8 +19,8 @@
         "url": "https://git.popcorntime.io/popcorntime/opensubtitles-api.git"
     },
     "dependencies": {
-        "q": "^1.4.1",
-        "lodash": "^2.4.1",
+        "bluebird": "^2.9.34",
+        "lodash": "^3.10.1",
         "xmlrpc": "^1.3.1"
     }
 }

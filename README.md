@@ -1,6 +1,6 @@
 # opensubtitles-api
 
-OpenSubtitles.org api wrapper for downloading subtitles.
+OpenSubtitles.org api wrapper for downloading and uploading subtitles.
 
 - This code is registered under GPLv3 - Copyright (c) 2015  Popcorn Time and the contributors (popcorntime.io)
 - More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)
@@ -20,29 +20,39 @@ var OpenSubtitles = new OS('UserAgent', 'Username', 'Password');
 
 *You can omit username and password to use OpenSubtitles.org anonymously (not all methods are available)*
 
+NOTE: 'Password' can be a MD5 encrypted string, OpenSubtitles accept these. It is recommended to use it. You can get the MD5 of a PASSWORD string by doing: `require('crypto').createHash('md5').update(PASSWORD).digest('hex');`
+
 ------
 
 ## Examples:
 
-###A simple login:
+### A simple login:
 
 ```js
 OpenSubtitles.login()
-    .then(function(token){
-        console.log(token)
+    .then(function(response){
+        console.log(response.token)
     })
     .catch(function(err){
         console.log(err)
     });
 ```
 
-will return: `6l89visrt089tqsm0qh4trbno6`
+If successful, will return:
 
-NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed, all calls are made by the module itself.
+```js
+Object {
+    token: "8qnesakc65g8kj1d58i6fonm61", 
+    status: "200 OK", 
+    seconds: 0.031
+}
+```
+
+NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed, all calls (search, upload) are made by the module itself.
 
 ------
 
-###Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
+### Get in touch with OpenSubtitles.org API directly (bypass the custom functions of the module):
 
 ```js
 // OpenSubtitles.api.method for raw xml-rpc capabilities
@@ -82,10 +92,10 @@ Example output:
 
 ```js
 Object {
-    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
-    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
-    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
-    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
+    ar: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    en: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    fr: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
+    po: "http://dl.opensubtitles.org/download/subtitle_file_id.srt",
     ru: "http://dl.opensubtitles.org/download/subtitle_file_id.srt"
 }
 ```
@@ -124,9 +134,9 @@ matched by other and uploaded by:
 
 ------
 
-###Upload a subtitle:
+### Upload a subtitle:
 
-```
+```js
 OpenSubtitles.upload({
         path: '/home/user/video.avi',       // path to video file
         subpath: '/home/user/video.srt'     // path to subtitle
@@ -141,11 +151,11 @@ OpenSubtitles.upload({
 
 Example output (if successfully uploaded):
 
-```
+```js
 {
-    status: '200 OK'
-    data: 'http://www.opensubtitles.org/subtitles/123456' //absolute link to subtitles
-    seconds: '1.171'
+    status: '200 OK',
+    data: 'http://www.opensubtitles.org/subtitles/123456', //absolute link to subtitles
+    seconds: '1.171',
 }
 ```
 
@@ -154,15 +164,15 @@ Only `path` and `subpath` are mandatory. However, it is **highly recommended** t
 Optionnal parameters are self-explanatory:
 
 - sublanguageid
-- automatictranslation
-- subauthorcomment
 - highdefinition
-- releasename
-- aka
 - hearingimpaired
+- moviereleasename
+- movieaka
 - moviefps
 - movieframes
 - movietimems
+- automatictranslation
+- subauthorcomment
 
 ------
 

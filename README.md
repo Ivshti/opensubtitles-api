@@ -54,7 +54,7 @@ Object {
 }
 ```
 
-*NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed, all calls (search, upload) are made by the module itself.*
+*NOTE: The `login()` call is useful to verify "Username" and "Password" (if you get a token, you're authentified, as simple as that), but is never needed for the custom calls (search, upload), they're made by the module itself. If you use raw xml-rpc call (OpenSubtitles.api.methodCall), prefer to login with the raw `OpenSubtitles.api.LogIn`*
 
 ------
 

@@ -2,7 +2,6 @@ var OS = require('./lib/opensubtitles.js'),
     libhash = require('./lib/hash.js'),
     libsearch = require('./lib/search.js'),
     libupload = require('./lib/upload.js'),
-    _ = require('lodash'),
     Promise = require('bluebird');
 
 var OpenSubtitles = module.exports = function (useragent, username, password) {
@@ -19,42 +18,34 @@ var OpenSubtitles = module.exports = function (useragent, username, password) {
 };
 
 OpenSubtitles.prototype.login = function () {
-    var self = this;
-    return new Promise(function (resolve, reject) {
-        self.api.LogIn(self.credentials.username, self.credentials.password, 'en', self.credentials.useragent)
-            .then(function (response) {
-                if (response.token && response.status.match(/200/)) {
-                    return resolve(response);
-                } else {
-                    throw new Error(response.status);
-                }
-            })
-            .catch(reject);
-    });
+    return this.api.LogIn(this.credentials.username, this.credentials.password, 'en', this.credentials.useragent)
+        .then(function (response) {
+            if (response.token && response.status.match(/200/)) {
+                return response;
+            } else {
+                throw new Error(response.status);
+            }
+        });
 };
 
 OpenSubtitles.prototype.search = function (data) {
     var self = this, 
-        results = [];
+        subs = [];
 
-    return new Promise(function (resolve, reject) {
-        self.login()
-            .then(function (response) {
-                data.token = response.token;
-                return libsearch.optimizeQueryTerms(data);
-            })
-            .map(function (optimizedQT) {
-                return self.api.SearchSubtitles(data.token, [optimizedQT])
-            })
-            .each(function (subs) {
-                results = results.concat(subs.data);
-            })
-            .then(function () {
-                return libsearch.optimizeSubs(results);
-            })
-            .then(resolve)
-            .catch(reject);
-    });
+    return this.login()
+        .then(function (response) {
+            data.token = response.token;
+            return libsearch.optimizeQueryTerms(data);
+        })
+        .map(function (optimizedQT) {
+            return self.api.SearchSubtitles(data.token, [optimizedQT])
+        })
+        .each(function (result) {
+            subs = subs.concat(result.data);
+        })
+        .then(function () {
+            return libsearch.optimizeSubs(subs);
+        });
 };
 
 OpenSubtitles.prototype.upload = function (data) {

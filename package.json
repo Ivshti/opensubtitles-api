@@ -1,6 +1,6 @@
 {
     "name": "opensubtitles-api",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "OpenSubtitles.org api wrapper for downloading and uploading subtitles",
     "author": {
         "name": "Popcorn Time",

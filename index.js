@@ -82,3 +82,10 @@ OpenSubtitles.prototype.upload = function (data) {
             .catch(reject);
     });
 };
+
+OpenSubtitles.prototype.extractInfo = function (path) {
+    if (!path) {
+        throw new Error('Missing path');
+    }
+    return libhash.computeHash(path);
+};

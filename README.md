@@ -1,15 +1,17 @@
 # opensubtitles-api
 
-**OpenSubtitles.org api wrapper for downloading and uploading subtitles.**
+**[OpenSubtitles.org](http://www.opensubtitles.org/) api wrapper for downloading and uploading subtitles.**
 
-Based on Promises and thus working asynchronously (thanks to Bluebird), this module uses XML-RPC (thanks to xmlrpc) to communicate with OpenSubtitles through HTTPS using Node.js
+Based on Promises and thus working asynchronously (thanks to Bluebird), this module uses XML-RPC (thanks to xmlrpc) to communicate with OpenSubtitles using Node.js
 
 In addition of allowing to use all available methodCalls asynchronously, it also allows you to directly use powerfull custom calls, like: 
 
 - `search`: Chained function returning the best matching subtitles based on the information you can feed it.
 - `upload`: Chained function requiring only the path to the video and to the subtitle files to send new subtitles to OpenSubtitles.org (flow: LogIn > TryUploadSubtitles > UploadSubtitles)
+- `extractInfo`: Function returning Hash and Byte size for a given video
 
-*More complete docs are available on [OpenSubtitles](http://trac.opensubtitles.org/projects/opensubtitles)*
+*More complete [docs](http://trac.opensubtitles.org/projects/opensubtitles) are available.*
+*This module requires a [valid UserAgent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).*
 
 ------
 
@@ -180,6 +182,24 @@ Optionnal parameters are self-explanatory:
 - subauthorcomment
 
 ------
+
+### Extract Hash & MovieByteSize
+
+```js
+OpenSubtitles.extractInfo('path/to/file.mp4')
+    .then(function (infos) {
+        console.log(infos);
+    });
+```
+
+Example output: 
+
+```js
+Object {
+    moviehash: 'b6e2dab8fc092977'
+    moviebytesize: '424954701'
+}
+```
 
 ## License
 

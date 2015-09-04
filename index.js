@@ -2,6 +2,7 @@ var OS = require('./lib/opensubtitles.js'),
     libhash = require('./lib/hash.js'),
     libsearch = require('./lib/search.js'),
     libupload = require('./lib/upload.js'),
+    _ = require('lodash'),
     Promise = require('bluebird');
 
 var OpenSubtitles = module.exports = function (useragent, username, password) {
@@ -33,12 +34,23 @@ OpenSubtitles.prototype.login = function () {
 };
 
 OpenSubtitles.prototype.search = function (data) {
-    var self = this;
+    var self = this, 
+        results = [];
+
     return new Promise(function (resolve, reject) {
         self.login()
             .then(function (response) {
                 data.token = response.token;
-                return libsearch.bestMatch(self.credentials.useragent, data);
+                return libsearch.optimizeQueryTerms(data);
+            })
+            .map(function (optimizedQT) {
+                return self.api.SearchSubtitles(data.token, [optimizedQT])
+            })
+            .each(function (subs) {
+                results = results.concat(subs.data);
+            })
+            .then(function () {
+                return libsearch.optimizeSubs(results);
             })
             .then(resolve)
             .catch(reject);

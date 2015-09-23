@@ -44,7 +44,7 @@ OpenSubtitles.prototype.search = function (data) {
             subs = subs.concat(result.data);
         })
         .then(function () {
-            return libsearch.optimizeSubs(subs);
+            return libsearch.optimizeSubs(subs, data);
         });
 };
 

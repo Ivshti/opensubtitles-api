@@ -84,10 +84,12 @@ OpenSubtitles.search({
     path: 'foo/bar.mp4',        // Complete path to the video file, it allows
                                 //   to automatically calculate 'hash'.
     filename: 'bar.mp4',        // The video file name. Better if extension
-                                //   is included
+                                //   is included.
     season: '2',
     episode: '3',
+    extension: ['srt', 'vtt'],  // Accepted extensions, defaults to 'srt'.
     imdbid: '528809',           // 'tt528809' is fine too.
+    fps: '23.96',               // Number of frames per sec in the video.
     query: 'Charlie Chaplin',   // Text-based query, this is not recommended.
 }).then(function (subtitles) {
     // an array of objects, no duplicates (ordered by
@@ -137,6 +139,10 @@ matched by other and uploaded by:
     + admin|trusted     4
     + platinum|gold     3
     + user|anon         0
+
+bonus of fps matching if:
+    + nothing matches   2
+    + imdb matches      0.5
 ```
 
 ------

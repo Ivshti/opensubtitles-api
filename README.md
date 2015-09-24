@@ -87,7 +87,7 @@ OpenSubtitles.search({
                                 //   is included.
     season: '2',
     episode: '3',
-    extension: ['srt', 'vtt'],  // Accepted extensions, defaults to 'srt'.
+    extensions: ['srt', 'vtt'],  // Accepted extensions, defaults to 'srt'.
     imdbid: '528809',           // 'tt528809' is fine too.
     fps: '23.96',               // Number of frames per sec in the video.
     query: 'Charlie Chaplin',   // Text-based query, this is not recommended.
